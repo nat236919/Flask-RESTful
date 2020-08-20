@@ -7,21 +7,14 @@ from config import DATABASE_CONFIG
 from typing import List, Dict, Any
 from flask_restful import Resource, reqparse
 
-# Set-up constant variables
-TODOS = {
-    'todo1': {'task': 'build an API'},
-    'todo2': {'task': '?????'},
-    'todo3': {'task': 'profit!'},
-}
-
-# Set db connection
+# Set MongoDB connection
 CONNECTION_STRING = DATABASE_CONFIG['mongodb_connection_string'].replace('{username}', DATABASE_CONFIG['username'])\
                                                                 .replace('{password}', DATABASE_CONFIG['password'])\
                                                                 .replace('{clustername}', DATABASE_CONFIG['clustername'])\
                                                                 .replace('{dbname}', DATABASE_CONFIG['dbname'])
 client = pymongo.MongoClient(CONNECTION_STRING)
-db = client.DATABASE_CONFIG['dbname']
-todolist_collection = db.todolist
+db = client[DATABASE_CONFIG['dbname']]
+todolist_collection = db['todolist']
 
 # Parser
 parser = reqparse.RequestParser()
