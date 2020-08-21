@@ -3,17 +3,9 @@ Resources - TodoList
 """
 # Import libs
 import time
-import pymongo
-from config import DATABASE_CONFIG
 from typing import List, Dict, Any
 from flask import jsonify
 from flask_restful import Resource, reqparse, abort
-
-# Set MongoDB connection
-CONNECTION_STRING = DATABASE_CONFIG['mongodb_connection_string'].replace('{username}', DATABASE_CONFIG['username'])\
-                                                                .replace('{password}', DATABASE_CONFIG['password'])\
-                                                                .replace('{clustername}', DATABASE_CONFIG['clustername'])\
-                                                                .replace('{dbname}', DATABASE_CONFIG['dbname'])
 
 # Parser
 parser = reqparse.RequestParser()
@@ -23,10 +15,8 @@ parser.add_argument('task')
 # TodoList
 # shows a list of all todos, and lets you POST to add new tasks
 class TodoList(Resource):
-    def __init__(self):
-        self.client = pymongo.MongoClient(CONNECTION_STRING)
-        self.db = self.client[DATABASE_CONFIG['dbname']]
-        self.todolist_collection = self.db['todolist']
+    def __init__(self, todolist_collection):
+        self.todolist_collection = todolist_collection
         self.data_schema = {
             '_id': '',
             'task': '',
