@@ -36,8 +36,8 @@ class TodoList(Resource):
 
     def get(self) -> List[Dict[str, Any]]:
         """ Get all the documents from the collection """
-        res = self.todolist_collection.find({})
-        return jsonify([doc for doc in res])
+        res = self._get_all_docs()
+        return jsonify(res)
 
     def post(self) -> Dict[str, Any]:
         """ Add a document onto the collection
@@ -49,9 +49,8 @@ class TodoList(Resource):
         args = parser.parse_args()
         if not args:
             return abort(400, message='data was not provided')
-    
-        all_docs = [doc for doc in self.todolist_collection.find({})]
-        cur_id = max(all_docs, key=lambda doc: doc['_id'])['_id'] # Get current document id
+
+        cur_id = self._get_current_id()
         try:
             data_schema = self.data_schema.copy()
             data_schema['_id'] = cur_id + 1
@@ -63,17 +62,32 @@ class TodoList(Resource):
             return abort(400, message=e)
 
         return data_schema, 201
-    
+
     def delete(self) -> None:
         """ Pop out the latest data """
-        todo_id = self._get_current_id()
-        todo_id = 'todo%i' % todo_id
-        TODOS.pop(todo_id)
+        cur_id = self._get_current_id()
+        if not cur_id:
+            return abort(400, message='no documents found')
+
+        try:
+            self.todolist_collection.delete_one({'_id': cur_id})
+
+        except Exception as e:
+            return abort(400, message=e)
+
         return '', 204
-    
+
+    def _get_all_docs(self) -> List[Dict[str, Any]]:
+        """ Get all documents in the collection """
+        return [doc for doc in self.todolist_collection.find({})]
+
     def _get_current_id(self) -> int:
         """ Get the current id (max) from TODOS """
-        if not TODOS:
+        all_docs = self._get_all_docs()
+        if not all_docs:
             return 0
-        return int(max(TODOS.keys()).lstrip('todo'))
-        
+
+        # Get current document id
+        cur_id = int(max(all_docs, key=lambda doc: doc['_id'])['_id'])
+
+        return cur_id
