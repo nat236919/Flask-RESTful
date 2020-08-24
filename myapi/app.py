@@ -5,11 +5,10 @@ RESTFUL API powered by Flask
 import pymongo
 from flask import Flask
 from flask_restful import Api
-from resources.todo import Todo
-from resources.todolist import TodoList
 
 from config import DATABASE_CONFIG
-
+from resources.todo import Todo
+from resources.todolist import TodoList
 
 # Initiate APP and API
 app = Flask(__name__)

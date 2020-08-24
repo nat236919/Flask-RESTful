@@ -3,9 +3,10 @@ Resources - TodoList
 """
 # Import libs
 import time
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+
 from flask import jsonify
-from flask_restful import Resource, reqparse, abort
+from flask_restful import Resource, abort, reqparse
 
 # Parser
 parser = reqparse.RequestParser()
