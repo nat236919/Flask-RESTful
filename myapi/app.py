@@ -6,12 +6,13 @@ import pymongo
 from flask import Flask
 from flask_restful import Api
 
-from config import DATABASE_CONFIG
+from config import APP_CONFIG, DATABASE_CONFIG
 from resources.todo import Todo
 from resources.todolist import TodoList
 
 # Initiate APP and API
 app = Flask(__name__)
+app.config['SECRET_KEY'] = APP_CONFIG['secret_key']
 api = Api(app)
 
 
