@@ -2,7 +2,6 @@
 Resources - Todo
 """
 # Import libs
-import json
 import time
 from typing import Any, Dict, List
 
@@ -11,7 +10,7 @@ from flask_restful import Resource, abort, reqparse
 
 # Parser
 parser = reqparse.RequestParser()
-parser.add_argument('data', type=dict)
+parser.add_argument('data', type=dict, required=True)
 
 
 # Todo

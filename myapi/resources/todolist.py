@@ -10,7 +10,7 @@ from flask_restful import Resource, abort, reqparse
 
 # Parser
 parser = reqparse.RequestParser()
-parser.add_argument('task')
+parser.add_argument('task', type=str, required=True)
 
 
 # TodoList
