@@ -26,7 +26,7 @@ db = client[DATABASE_CONFIG['dbname']]
 
 # Set-up Resources
 api.add_resource(TodoList, '/todos', resource_class_kwargs={'todolist_collection': db['todolist']})
-# api.add_resource(Todo, '/todos/<string:todo_id>')
+api.add_resource(Todo, '/todos/<string:todo_id>', resource_class_kwargs={'todolist_collection': db['todolist']})
 
 
 # Run app
