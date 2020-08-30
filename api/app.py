@@ -9,6 +9,7 @@ from flask_restful import Api
 from config import APP_CONFIG, DATABASE_CONFIG
 from resources.todo import Todo
 from resources.todolist import TodoList
+from resources.user import User
 
 # Initiate APP and API
 app = Flask(__name__)
@@ -28,6 +29,7 @@ db = client[DATABASE_CONFIG['dbname']]
 # Set-up Resources
 api.add_resource(TodoList, '/todos', resource_class_kwargs={'todolist_collection': db['todolist']})
 api.add_resource(Todo, '/todos/<string:todo_id>', resource_class_kwargs={'todolist_collection': db['todolist']})
+api.add_resource(User, '/users', resource_class_kwargs={'user_collection': db['users']})
 
 
 # Run app
