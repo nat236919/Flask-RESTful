@@ -38,7 +38,13 @@ class Register(Resource):
         args = parser.parse_args()
         if not args:
             return abort(400, message='data was not provided')
+        
+        # Check existing username
+        all_usernames = [data.get('username') for data in self._get_all_docs()]
+        if args['data'].get('username') in all_usernames:
+            return abort(409, message='username already exists') 
 
+        # Register a new username
         cur_id = self._get_current_id()
         try:
             data_schema = self.data_schema.copy()
