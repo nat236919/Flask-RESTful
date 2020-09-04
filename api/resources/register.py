@@ -29,7 +29,7 @@ class Register(Resource):
     
     def post(self) -> Dict[str, Any]:
         """ Register a user to a database
-            Schema: {
+            data: {
                 'username': str,
                 'password': sha256_crypt.hash("password"),
                 'is_admin': bool
