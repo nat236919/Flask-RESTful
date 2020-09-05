@@ -23,6 +23,7 @@ class Login(Resource):
     def __init__(self, user_collection):
         self.user_collection = user_collection
         self.payload = {
+            'user_id': '',
             'username': '',
             'is_admin': '',
             'exp': ''
@@ -58,7 +59,8 @@ class Login(Resource):
         
         # Generate JWT
         payload = self.payload.copy()
-        payload['username'] = username
+        payload['user_id'] = existing_user.get('_id')
+        payload['username'] = existing_user.get('username')
         payload['is_admin'] = existing_user.get('is_admin')
         payload['exp'] = datetime.datetime.utcnow() + datetime.timedelta(seconds=180)
         encoded = jwt.encode(payload, APP_CONFIG['secret_key'], algorithm='HS256')
