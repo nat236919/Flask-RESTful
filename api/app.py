@@ -9,8 +9,6 @@ from flask_restful import Api
 from config import APP_CONFIG, DATABASE_CONFIG
 from resources.todo import Todo
 from resources.todolist import TodoList
-
-
 from resources.user import UserAdmin, UserRegister, UserLogin
 
 # Initiate APP and API
