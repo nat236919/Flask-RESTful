@@ -7,7 +7,7 @@ import time
 import datetime
 from typing import Any, Dict, List
 
-from flask import jsonify
+from flask import request, jsonify
 from flask_restful import Resource, abort, reqparse
 from passlib.hash import sha256_crypt
 
@@ -49,7 +49,27 @@ class UserAdmin(Resource, UserBase):
         self.user_collection = user_collection
 
     def get(self) -> List[Dict[str, Any]]:
-        """ Get all users from the collection """
+        """ Get all users from the collection
+            header {
+                'Authorization': 'Bearer JWT'
+            }
+        """
+        try:
+            if 'Authorization' not in request.headers:
+                raise Exception('Authorization not found')
+
+            auth_header = request.headers['Authorization'].split(' ')
+            if not len(auth_header) > 1:
+                raise Exception('Authorization not found')
+
+            encoded = auth_header[-1]
+            decoded = jwt.decode(encoded, APP_CONFIG['secret_key'], algorithms='HS256')
+            if not decoded['is_admin']:
+                raise Exception('Unauthorization')
+        
+        except Exception as e:
+            return abort(401, message=f'{e}')
+        
         res = self._get_all_docs()
         return jsonify(res)
 
