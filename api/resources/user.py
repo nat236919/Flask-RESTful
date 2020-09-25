@@ -12,6 +12,7 @@ from flask_restful import Resource, abort, reqparse
 from passlib.hash import sha256_crypt
 
 from config import APP_CONFIG
+from common.util import JWTAuthentication
 
 # Setup Parser
 parser = reqparse.RequestParser()
@@ -19,7 +20,7 @@ parser.add_argument('data', type=dict, required=True)
 
 
 # User - Base
-class UserBase():
+class UserBase:
     def __init__(self):
         self.data_schema = {
             '_id': '',
@@ -46,6 +47,7 @@ class UserBase():
 # User - Admin
 class UserAdmin(Resource, UserBase):
     def __init__(self, user_collection):
+        self.jwt_authentication = JWTAuthentication()
         self.user_collection = user_collection
 
     def get(self) -> List[Dict[str, Any]]:
@@ -53,22 +55,10 @@ class UserAdmin(Resource, UserBase):
             header {
                 'Authorization': 'Bearer JWT'
             }
-        """
-        try:
-            if 'Authorization' not in request.headers:
-                raise Exception('Authorization not found')
-
-            auth_header = request.headers['Authorization'].split(' ')
-            if not len(auth_header) > 1:
-                raise Exception('Authorization not found')
-
-            encoded = auth_header[-1]
-            decoded = jwt.decode(encoded, APP_CONFIG['secret_key'], algorithms='HS256')
-            if not decoded['is_admin']:
-                raise Exception('Unauthorization')
-        
-        except Exception as e:
-            return abort(401, message=f'{e}')
+        """        
+        is_admin = self.jwt_authentication.is_admin()
+        if not is_admin:
+            return abort(401, message='Unauthorization')
         
         res = self._get_all_docs()
         return jsonify(res)
