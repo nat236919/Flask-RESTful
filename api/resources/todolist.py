@@ -8,6 +8,8 @@ from typing import Any, Dict, List
 from flask import jsonify
 from flask_restful import Resource, abort, reqparse
 
+from common.util import JWTAuthentication
+
 # Parser
 parser = reqparse.RequestParser()
 parser.add_argument('task', type=str, required=True)
@@ -17,11 +19,13 @@ parser.add_argument('task', type=str, required=True)
 # shows a list of all todos, and lets you POST to add new tasks
 class TodoList(Resource):
     def __init__(self, todolist_collection):
+        self.jwt_authentication = JWTAuthentication()
         self.todolist_collection = todolist_collection
         self.data_schema = {
             '_id': '',
             'task': '',
             'is_complete': False,
+            'user_id': '',
             'created_ts': ''
         }
 
@@ -37,15 +41,21 @@ class TodoList(Resource):
                     "task": "example task"
                 }
         """
+        # Check argument
         args = parser.parse_args()
         if not args:
             return abort(400, message='data was not provided')
+        
+        # Check JWT
+        if not self.jwt_authentication.is_JWT_valid():
+            return abort(401, message='Unauthorization')
 
-        cur_id = self._get_current_id()
+        # Insert data
         try:
             data_schema = self.data_schema.copy()
-            data_schema['_id'] = cur_id + 1
+            data_schema['_id'] = self._get_current_id() + 1
             data_schema['task'] = args['task']
+            data_schema['user_id'] = self.jwt_authentication.get_JWT_from_header().get('data').get('user_id') # use payload user_id
             data_schema['created_ts'] = time.time()
             self.todolist_collection.insert_one(data_schema.copy())
 
