@@ -33,20 +33,26 @@ class JWTAuthentication:
                 raise Exception('Authorization not found')
 
             encoded = auth_header[-1]
-            decoded = jwt.decode(encoded, APP_CONFIG['secret_key'], algorithms='HS256')
+            decoded = jwt.decode(
+                encoded, APP_CONFIG['secret_key'], algorithms='HS256')
             res_data['result'] = 'success'
             res_data['data'] = decoded
-        
+
         except Exception as e:
             res_data['result'] = e
-        
+
         finally:
             return res_data
-    
+
+    def is_JWT_valid(self) -> bool:
+        res_data = self._get_jwt_from_header()
+        if res_data['result'] in ['success']:
+            return True
+        return False
+
     def is_admin(self) -> bool:
         """ Check admin status from valid JWT """
         res_data = self._get_JWT_from_header()
         if res_data['result'] in ['success'] and res_data['data'].get('is_admin'):
             return True
         return False
-    
